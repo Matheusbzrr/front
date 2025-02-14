@@ -1,0 +1,90 @@
+:root {
+    --cor-cafe-escuro: #c9c1ad;
+    --cor-cafe-claro: #8d5511;
+    --cor-cafe-claro-escuro: #4A2C2A;
+    --cor-cafe-mais-escuro: #8B4513;
+    --cor-bege-claro: #FEFAF6;
+    --cor-laranja-cafe: #c4b6ac;
+    --cor-branco: #ebe2e2;
+}
+
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--cor-cafe-escuro);
+}
+
+
+.modal-dialog {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.form-control {
+    background-color: var(--cor-bege-claro);
+    border-color: var(--cor-cafe-claro-escuro);
+}
+
+.form-control:focus {
+    border-color: var(--cor-cafe-mais-escuro);
+    box-shadow: 0 0 0 1px var(--cor-cafe-mais-escuro);
+}
+
+
+.card-header {
+    background-color: var(--cor-cafe-claro) !important;
+    color: var(--cor-branco) !important;
+    text-align: center;
+    padding: 1rem;
+}
+
+
+.btn-primary {
+    background-color: var(--cor-cafe-claro);
+    border-color: var(--cor-cafe-claro-escuro);
+}
+
+.btn-primary:hover {
+    background-color: var(--cor-cafe-claro-escuro);
+    border-color: var(--cor-cafe-mais-escuro);
+}
+
+
+#userHelp,
+#passwordHelp {
+    color: var(--cor-laranja-cafe);
+}
+
+
+footer {
+    background-color: var(--cor-cafe-escuro);
+    color: var(--cor-bege-claro);
+}
+
+
+.card-body {
+    background-color: var(--cor-bege-claro);
+}
+
+
+.card {
+    border: 1px solid var(--cor-cafe-claro-escuro);
+}
