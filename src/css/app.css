@@ -1,0 +1,45 @@
+.list-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Personalizar scrollbar */
+.list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.list-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.list-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+@media (max-width: 768px) {
+    .list-container {
+        max-height: 50vh;
+    }
+}
+
+.purchased {
+    text-decoration: line-through;
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+.list-group-item:hover {
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+.quantity-badge {
+    min-width: 70px;
+}

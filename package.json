@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Matheusbzrr/front#readme",
   "description": "",
   "dependencies": {
+    "front-1": "file:",
     "sweetalert2": "^11.16.1"
   }
 }

@@ -20,18 +20,31 @@ document
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        const token = localStorage.getItem("token");
-
-        if (token) {
-          window.location.href = "/src/pages/app.html";
-        } else {
-          alert("Token não encontrado. Por favor, faça login novamente.");
-        }
       } else {
-        alert("Erro no login: " + (data.message || "Credenciais inválidas"));
+        Swal.fire({
+          icon: "error",
+          title: "Erro!",
+          text: "Tente o login novamente!" || data.message,
+          background: "#FEFAF6",
+          color: "#242424",
+          confirmButtonColor: "#4A2C2A",
+        });
+      }
+
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        window.location.href = "/src/pages/app.html";
       }
     } catch (error) {
       console.error("Erro ao logar:", error);
-      alert("Ocorreu um erro ao tentar logar.");
+      Swal.fire({
+        icon: "error",
+        title: "Erro!",
+        text: "Tente o login novamente!",
+        background: "#FEFAF6",
+        color: "#242424",
+        confirmButtonColor: "#4A2C2A",
+      });
     }
   });

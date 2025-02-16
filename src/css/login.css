@@ -1,11 +1,11 @@
 :root {
-    --cor-cafe-escuro: #c9c1ad;
-    --cor-cafe-claro: #8d5511;
-    --cor-cafe-claro-escuro: #4A2C2A;
-    --cor-cafe-mais-escuro: #8B4513;
-    --cor-bege-claro: #FEFAF6;
-    --cor-laranja-cafe: #c4b6ac;
-    --cor-branco: #ebe2e2;
+    --cor-cafe-escuro: #1C1C1C;
+    --cor-cafe-claro: #4B382A;
+    --cor-cafe-claro-escuro: #6e6e6d;
+    --cor-cafe-mais-escuro: #eeece9;
+    --cor-bege-claro: #ececec;
+    --cor-laranja-cafe: #A67B5B;
+    --cor-branco: #FEFAF6;
 }
 
 
@@ -58,7 +58,7 @@ body {
 
 
 .btn-primary {
-    background-color: var(--cor-cafe-claro);
+    background-color: var(--cor-laranja-cafe);
     border-color: var(--cor-cafe-claro-escuro);
 }
 
