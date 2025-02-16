@@ -1,7 +1,7 @@
 document
   .getElementById("login-form")
   .addEventListener("submit", async function (event) {
-    event.preventDefault(); // Impede o envio real do formulário
+    event.preventDefault();
 
     const formData = new FormData(this);
     const formObject = Object.fromEntries(formData.entries());

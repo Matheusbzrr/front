@@ -1,187 +1,137 @@
 window.addEventListener("load", function () {
   const token = localStorage.getItem("token");
-
   if (!token) {
     window.location.href = "/src/pages/login.html";
-  } else {
-    console.log("Token encontrado:", token);
-
-    // Chamar a api
   }
+  carregarListasSalvas();
 });
 
-class ShoppingList {
-  constructor() {
-    this.items = JSON.parse(localStorage.getItem("shoppingList")) || [];
-    this.loadItems();
-    this.initEvents();
-    this.updateCounter();
+function sair() {
+  localStorage.removeItem("token");
+  window.location.href = "/src/pages/login.html";
+}
+
+let listaCompras = [];
+let listasSalvas = JSON.parse(localStorage.getItem("listasSalvas")) || [];
+
+function adicionarItem() {
+  const produto = document.getElementById("produtoInput").value;
+  const quantidade = document.getElementById("quantidadeInput").value;
+  const unidade = document.getElementById("unidadeSelect").value;
+
+  if (!produto) {
+    alert("Por favor, insira o nome do produto!");
+    return;
   }
 
-  initEvents() {
-    document
-      .getElementById("add-item")
-      .addEventListener("click", () => this.addItem());
-    document
-      .getElementById("product-input")
-      .addEventListener("keypress", (e) => {
-        if (e.key === "Enter") this.addItem();
-      });
-    document
-      .getElementById("quantity-input")
-      .addEventListener("keypress", (e) => {
-        if (e.key === "Enter") this.addItem();
-      });
-    document
-      .getElementById("clear-all")
-      .addEventListener("click", () => this.clearAll());
+  const novoItem = { produto, quantidade, unidade, id: Date.now() };
+  listaCompras.push(novoItem);
+  atualizarLista();
+  limparCampos();
+}
+
+function exportarLista() {
+  if (listaCompras.length === 0) {
+    alert("A lista está vazia!");
+    return;
   }
 
-  addItem() {
-    const productInput = document.getElementById("product-input");
-    const quantityInput = document.getElementById("quantity-input");
+  const novaLista = {
+    id: Date.now(),
+    data: new Date().toLocaleDateString("pt-BR"),
+    itens: [...listaCompras],
+  };
 
-    const product = productInput.value.trim();
-    const quantity = quantityInput.value.trim();
+  listasSalvas.push(novaLista);
+  localStorage.setItem("listasSalvas", JSON.stringify(listasSalvas));
+  criarCardLista(novaLista);
 
-    if (product && quantity) {
-      const [amount, unit] = this.parseQuantity(quantity);
+  listaCompras = [];
+  atualizarLista();
 
-      const newItem = {
-        id: Date.now(),
-        product,
-        amount,
-        unit,
-        purchased: false,
-      };
+  const modal = bootstrap.Modal.getInstance(
+    document.getElementById("staticBackdrop")
+  );
+  if (modal) modal.hide();
+}
 
-      this.items.push(newItem);
-      this.saveAndReload();
-
-      productInput.value = "";
-      quantityInput.value = "";
-      productInput.focus();
-    } else {
-      Swal.fire("Ops!", "Preencha todos os campos corretamente!", "warning");
-    }
-  }
-
-  parseQuantity(input) {
-    const parts = input.split(" ");
-    const amount = parts[0] || "";
-    const unit = parts.slice(1).join(" ") || "un";
-    return [amount, unit];
-  }
-
-  deleteItem(id) {
-    this.items = this.items.filter((item) => item.id !== id);
-    this.saveAndReload();
-  }
-
-  editItem(id) {
-    const item = this.items.find((item) => item.id === id);
-    Swal.fire({
-      title: "Editar Item",
-      html: `
-        <input id="edit-product" class="swal2-input" value="${item.product}">
-        <input id="edit-quantity" class="swal2-input" value="${item.amount} ${item.unit}">
-      `,
-      showCancelButton: true,
-      confirmButtonText: "Salvar",
-      cancelButtonText: "Cancelar",
-      preConfirm: () => {
-        const product = document.getElementById("edit-product").value.trim();
-        const quantity = document.getElementById("edit-quantity").value.trim();
-        if (!product || !quantity) {
-          Swal.showValidationMessage("Preencha todos os campos");
-          return false;
-        }
-        const [amount, unit] = this.parseQuantity(quantity);
-        return { product, amount, unit };
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        item.product = result.value.product;
-        item.amount = result.value.amount;
-        item.unit = result.value.unit;
-        this.saveAndReload();
-      }
-    });
-  }
-
-  togglePurchased(id) {
-    const item = this.items.find((item) => item.id === id);
-    item.purchased = !item.purchased;
-    this.saveAndReload();
-  }
-
-  clearAll() {
-    Swal.fire({
-      title: "Limpar lista toda?",
-      text: "Esta ação não pode ser desfeita!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sim, limpar!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.items = [];
-        this.saveAndReload();
-      }
-    });
-  }
-
-  saveAndReload() {
-    localStorage.setItem("shoppingList", JSON.stringify(this.items));
-    this.loadItems();
-    this.updateCounter();
-  }
-
-  loadItems() {
-    const list = document.getElementById("shopping-list");
-    list.innerHTML = this.items
-      .map(
-        (coisa) => `
-      <li class="list-group-item d-flex justify-content-between align-items-center ${
-        coisa.purchased ? "purchased" : ""
-      }">
-        <div class="form-check d-flex align-items-center gap-3">
-          <input 
-            class="form-check-input" 
-            type="checkbox" 
-            ${coisa.purchased ? "checked" : ""}
-            onchange="shoppingList.togglePurchased(${coisa.id})"
-          >
-          <span class="product-name">${coisa.product}</span>
-          <span class="badge bg-primary rounded-pill quantity-badge">
-            ${coisa.amount} ${coisa.unit}
-          </span>
-        </div>
-        <div class="btn-group">
-          <button class="btn btn-sm btn-outline-secondary" onclick="shoppingList.editItem(${
-            coisa.id
-          })">
-            ✏️
-          </button>
-          <button class="btn btn-sm btn-outline-danger" onclick="shoppingList.deleteItem(${
-            coisa.id
-          })">
-            🗑️
-          </button>
-        </div>
-      </li>
-    `
-      )
-      .join("");
-  }
-
-  updateCounter() {
-    const total = this.items.length;
-    document.getElementById("total-items").textContent = `${total} ${
-      total === 1 ? "item" : "itens"
-    }`;
+function deletarLista(id) {
+  if (confirm("Tem certeza que deseja excluir esta lista?")) {
+    listasSalvas = listasSalvas.filter((lista) => lista.id !== id);
+    localStorage.setItem("listasSalvas", JSON.stringify(listasSalvas));
+    document.getElementById(`card-${id}`).remove();
   }
 }
 
-const shoppingList = new ShoppingList();
+function criarCardLista(lista) {
+  const cardsContainer = document.getElementById("cardsContainer");
+  const cardHTML = `
+    <div class="col" id="card-${lista.id}">
+      <div class="card h-100 lista-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Lista de Compras</h5>
+            <button class="btn btn-danger btn-sm" onclick="deletarLista(${lista.id})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <p class="card-text"><small class="text-muted">Criada em: ${lista.data}</small></p>
+        </div>
+        <div class="card-footer bg-transparent">
+          <button class="btn btn-link" onclick="abrirModalLista(${lista.id})">
+            Ver Itens <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  cardsContainer.insertAdjacentHTML("afterbegin", cardHTML);
+}
+
+function abrirModalLista(id) {
+  const lista = listasSalvas.find((l) => l.id === id);
+  document.getElementById("listaData").textContent = lista.data;
+  const listaItens = document.getElementById("listaItensModal");
+  listaItens.innerHTML = "";
+
+  lista.itens.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.className = "list-group-item";
+    li.textContent = `${index + 1}. ${item.produto} - ${item.quantidade}${
+      item.unidade
+    }`;
+    listaItens.appendChild(li);
+  });
+
+  new bootstrap.Modal(document.getElementById("listaModal")).show();
+}
+
+function carregarListasSalvas() {
+  listasSalvas.forEach(criarCardLista);
+}
+
+function limparCampos() {
+  document.getElementById("produtoInput").value = "";
+  document.getElementById("quantidadeInput").value = 1;
+  document.getElementById("unidadeSelect").value = "un";
+}
+
+function atualizarLista() {
+  const lista = document.querySelector("#listaItens ul");
+  lista.innerHTML = "";
+  listaCompras.forEach((item) => {
+    const li = document.createElement("li");
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `
+                    ${item.produto} - ${item.quantidade}${item.unidade}
+                    <button onclick="removerItem(${item.id})" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </button>`;
+    lista.appendChild(li);
+  });
+}
+
+function removerItem(id) {
+  listaCompras = listaCompras.filter((item) => item.id !== id);
+  atualizarLista();
+}

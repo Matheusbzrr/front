@@ -1,45 +1,72 @@
-.list-container {
-    max-height: 60vh;
-    overflow-y: auto;
-    position: relative;
+:root {
+    --cor-cafe-escuro: #1C1C1C;
+    --cor-cafe-claro: #4B382A;
+    --cor-cinza: #6e6e6d;
+    --cor-offw: #eeece9;
+    --cor-bege-claro: #ececec;
+    --cor-laranja-cafe: #A67B5B;
+    --cor-branco: #FEFAF6;
 }
 
-/* Personalizar scrollbar */
-.list-container::-webkit-scrollbar {
-    width: 8px;
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--cor-cinza);
 }
 
-.list-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+.navbar {
+    background-color: var(--cor-cafe-claro) !important;
 }
 
-.list-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+.lista-card {
+    transition: transform 0.2s;
 }
 
-.list-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
+.lista-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    display: none;
 }
 
 @media (max-width: 768px) {
-    .list-container {
-        max-height: 50vh;
+    .floating-btn {
+        display: block;
+    }
+
+    #cardsContainer {
+        margin-bottom: 5rem;
     }
 }
 
-.purchased {
-    text-decoration: line-through;
-    background-color: #f8f9fa;
-    opacity: 0.7;
+/* Personalização da Scrollbar */
+#listaItens::-webkit-scrollbar {
+    width: 8px;
 }
 
-.list-group-item:hover {
-    transform: translateX(5px);
-    transition: all 0.3s ease;
+#listaItens::-webkit-scrollbar-track {
+    background: var(--cor-bege-claro);
+    border-radius: 4px;
 }
 
-.quantity-badge {
-    min-width: 70px;
+#listaItens::-webkit-scrollbar-thumb {
+    background-color: var(--cor-laranja-cafe);
+    border-radius: 4px;
+}
+
+/* Ajuste de Espaçamento */
+.modal-body {
+    gap: 1rem;
 }

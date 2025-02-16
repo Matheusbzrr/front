@@ -37,6 +37,9 @@ body {
     object-fit: cover;
 }
 
+.navbar {
+    background-color: var(--cor-cafe-claro) !important;
+}
 
 .form-control {
     background-color: var(--cor-bege-claro);
