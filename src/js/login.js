@@ -8,7 +8,7 @@ document
 
     try {
       const response = await fetch(
-        "https://api-lista-compras-lcvz17lmb-matheusbzrrs-projects.vercel.app/auth/login",
+        "https://api-fp44ct2px-matheusbzrrs-projects.vercel.app/auth/login",
         {
           method: "POST",
           headers: {
