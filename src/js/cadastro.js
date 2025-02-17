@@ -21,7 +21,7 @@ document
 
     try {
       const response = await fetch(
-        "https://api-six-mocha.vercel.app//auth/register",
+        "https://api-six-mocha.vercel.app/auth/register",
         {
           method: "POST",
           headers: {
