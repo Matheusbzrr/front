@@ -3,9 +3,9 @@ document
   .addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("emailCadastro").value;
-    const password = document.getElementById("passwordCadastro").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("emailCadastro").value.trim();
+    const password = document.getElementById("passwordCadastro").value.trim();
 
     if (!name || !email || !password) {
       Swal.fire({
@@ -20,18 +20,21 @@ document
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const response = await fetch(
+        "https://api-lista-compras-lcvz17lmb-matheusbzrrs-projects.vercel.app/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erro ao cadastrar");
+        throw new Error(data.message || "Erro ao cadastrar. Tente novamente.");
       }
 
       Swal.fire({
@@ -42,16 +45,21 @@ document
         color: "#242424",
         confirmButtonColor: "#4A2C2A",
       }).then(() => {
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("cadastroModal")
-        );
-        modal.hide();
+        // Fechar o modal se ele existir
+        const modalElement = document.getElementById("cadastroModal");
+        if (modalElement) {
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          if (modal) modal.hide();
+        }
+
+        // Resetar o formulário
         document.getElementById("cadastro-form").reset();
       });
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Erro!",
+        text: error.message || "Ocorreu um erro inesperado. Tente novamente.",
         background: "#FEFAF6",
         color: "#242424",
         confirmButtonColor: "#4A2C2A",
