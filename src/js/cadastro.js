@@ -21,7 +21,7 @@ document
 
     try {
       const response = await fetch(
-        "app-lista-compras.vercel.app/auth/register",
+        "https://app-lista-compras.vercel.app/auth/register",
         {
           method: "POST",
           headers: {
