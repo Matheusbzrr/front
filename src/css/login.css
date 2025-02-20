@@ -61,7 +61,12 @@ body {
 
 
 .btn-primary {
-    background-color: var(--cor-laranja-cafe);
+    background-color: var(--cor-cafe-escuro);
+    border-color: var(--cor-cafe-claro-escuro);
+}
+
+.btn-secondary {
+    background-color: var(--cor-cafe-claro);
     border-color: var(--cor-cafe-claro-escuro);
 }
 
