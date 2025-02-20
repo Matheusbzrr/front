@@ -49,7 +49,7 @@
 
     <main class="container mt-5">
       <section>
-        <h4 class="mb-4 text-center">Suas Listas</h4>
+        <h4 class="mb-2 text-center">Suas Listas</h4>
         <div
           id="cardsContainer"
           class="row row-cols-1 row-cols-md-3 g-4 justify-content-center"
@@ -59,6 +59,7 @@
       <div class="text-center mt-5 py-5">
         <button
           type="button"
+          title="Nova Lista de compras"
           class="btn btn-primary btn-lg d-none d-md-inline-block"
           data-bs-toggle="modal"
           data-bs-target="#staticBackdrop"
@@ -67,6 +68,7 @@
         </button>
         <button
           type="button"
+          title="Nova Lista de compras"
           class="btn btn-primary rounded-circle floating-btn"
           data-bs-toggle="modal"
           data-bs-target="#staticBackdrop"
@@ -85,6 +87,7 @@
               </h5>
               <button
                 type="button"
+                title="Fechar modal"
                 class="btn-close"
                 data-bs-dismiss="modal"
               ></button>
@@ -109,6 +112,7 @@
               <h5 class="modal-title">Criar Nova Lista de Compras</h5>
               <button
                 type="button"
+                title="Fechar modal"
                 class="btn-close"
                 data-bs-dismiss="modal"
               ></button>
@@ -127,6 +131,7 @@
                   <div class="col-md-6">
                     <input
                       type="text"
+                      title="Digite o nome do produto"
                       id="produtoInput"
                       class="form-control"
                       placeholder="Nome do produto"
@@ -135,6 +140,7 @@
                   <div class="col-md-3">
                     <input
                       type="number"
+                      title="Digite a quantidade do produto"
                       id="quantidadeInput"
                       class="form-control"
                       placeholder="Quantidade"
@@ -153,13 +159,18 @@
                 <button
                   onclick="adicionarItem()"
                   class="btn btn-primary w-100 mt-3"
+                  title="Adicionar item à lista"
                 >
                   <i class="bi bi-plus-circle me-2"></i>Adicionar Item
                 </button>
               </div>
             </div>
             <div class="modal-footer">
-              <button onclick="exportarLista()" class="btn btn-success">
+              <button
+                onclick="exportarLista()"
+                class="btn btn-success"
+                title="Exportar lista de compras"
+              >
                 <i class="bi bi-save"></i> Salvar Lista
               </button>
             </div>

@@ -1,9 +1,7 @@
 :root {
-    --cor-cafe-escuro: #1C1C1C;
+
     --cor-cafe-claro: #4B382A;
-    --cor-cinza: #6e6e6d;
-    --cor-offw: #eeece9;
-    --cor-bege-claro: #ececec;
+    --cor-bege-claro: #f7f4f4;
     --cor-laranja-cafe: #A67B5B;
     --cor-branco: #FEFAF6;
 }
@@ -16,7 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     font-family: 'Raleway', sans-serif;
-    background-color: var(--cor-cinza);
+    background-color: var(--cor-bege-claro);
 }
 
 .navbar {
