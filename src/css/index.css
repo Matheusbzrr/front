@@ -1,12 +1,14 @@
 :root {
-    --cor-cafe-escuro: #1C1C1C;
-    --cor-cafe-claro: #4B382A;
-    --cor-cinza: #6e6e6d;
-    --cor-offw: #eeece9;
-    --cor-bege-claro: #ececec;
-    --cor-laranja-cafe: #A67B5B;
-    --cor-branco: #FEFAF6;
+    --cor-preto: #0D0D0D;
+    --cor-verde-escuro: #012619;
+    --cor-cinza: #6e6d6d;
+    --cor-verde-opaco: #118C5F;
+    --cor-branco-base: #eeece9;
+    --cor-verde-claro: #25D997;
+    --cor-verde-neon: #1DF2A4;
+
 }
+
 
 
 html,
@@ -16,7 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     font-family: 'Raleway', sans-serif;
-    background-color: var(--cor-cinza);
+
 }
 
 main {
@@ -24,7 +26,7 @@ main {
 }
 
 .navbar {
-    background-color: var(--cor-cafe-claro) !important;
+    background-color: var(--cor-verde-opaco) !important;
 }
 
 .hero-section {
@@ -33,7 +35,7 @@ main {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: var(--cor-branco);
+    background-color: var(--cor-verde-escuro);
 }
 
 /* Título principal */
@@ -41,25 +43,25 @@ main {
     font-size: 3rem;
     font-weight: bold;
     text-transform: uppercase;
-    color: var(--cor-cafe-escuro);
+    color: var(--cor-verde-neon);
     margin-bottom: 2rem;
 }
 
 .hero-title span {
-    color: var(--cor-laranja-cafe);
+    color: var(--cor-branco-base);
 }
 
 /* Subtítulo */
 .hero-subtitle {
     font-size: 1.25rem;
-    color: var(--cor-cinza);
+    color: var(--cor-branco-base);
     margin-bottom: 2rem;
 }
 
 /* Texto descritivo */
 .hero-text {
     font-size: 1rem;
-    color: var(--cor-cafe-claro);
+    color: var(--cor-branco-base);
     margin-bottom: 2rem;
 }
 
@@ -70,18 +72,18 @@ main {
     font-size: 1rem;
     font-weight: bold;
     text-decoration: none;
-    color: var(--cor-branco);
-    background-color: var(--cor-cafe-escuro);
+    color: var(--cor-pretos);
+    background-color: var(--cor-verde-claro);
     border-radius: 5px;
     transition: 0.3s ease-in-out;
 }
 
 .hero-btn:hover {
-    background-color: var(--cor-cafe-claro);
+    background-color: var(--cor-verde-neon);
 }
 
 /* Ícones laterais */
 .icon {
     font-size: 4rem;
-    color: var(--cor-cafe-claro);
+    color: var(--cor-verde-neon);
 }

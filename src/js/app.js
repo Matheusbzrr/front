@@ -1,16 +1,3 @@
-window.addEventListener("load", function () {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "/src/pages/login.html";
-  }
-  carregarListasSalvas();
-});
-
-function sair() {
-  localStorage.removeItem("token");
-  window.location.href = "/src/pages/login.html";
-}
-
 let listaCompras = [];
 let listasSalvas = JSON.parse(localStorage.getItem("listasSalvas")) || [];
 
