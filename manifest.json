@@ -1,10 +1,10 @@
 {
   "name": "Lista Ae!",
   "short_name": "Lista",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f7f4f4",
-  "theme_color": "#4B382A",
+  "background_color": "#012619",
+  "theme_color": "#118c5f",
   "icons": [
     {
       "src": "src/icons/icon-48x48.png",
@@ -41,5 +41,6 @@
       "sizes": "1024x1024",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "Uma lista de compras"
 }
