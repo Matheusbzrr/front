@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,6 +38,11 @@
               <li class="nav-item">
                 <a class="nav-link active" href="/src/pages/app.html">Início</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/src/pages/localization.html"
+                  >Mercados</a
+                >
+              </li>
               <li id="out" class="nav-item">
                 <a class="nav-link" onclick="sair()" href="/index.html">Sair</a>
               </li>
@@ -49,7 +54,7 @@
 
     <main class="container mt-5">
       <section>
-        <h4 class="mb-2 text-center">Suas Listas</h4>
+        <h4 id="title" class="mb-2 text-center">Suas Listas</h4>
         <div
           id="cardsContainer"
           class="row row-cols-1 row-cols-md-3 g-4 justify-content-center"
@@ -58,6 +63,7 @@
 
       <div class="text-center mt-5 py-5">
         <button
+          id="shopping-list"
           type="button"
           title="Nova Lista de compras"
           class="btn btn-primary btn-lg d-none d-md-inline-block"
@@ -67,6 +73,7 @@
           <i class="bi bi-plus-circle me-2"></i>Criar Nova Lista
         </button>
         <button
+          id="shopping-list-mobile"
           type="button"
           title="Nova Lista de compras"
           class="btn btn-primary rounded-circle floating-btn"

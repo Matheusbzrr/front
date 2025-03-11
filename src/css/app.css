@@ -1,9 +1,12 @@
 :root {
+    --cor-preto: #0D0D0D;
+    --cor-verde-escuro: #012619;
+    --cor-cinza: #6e6d6d;
+    --cor-verde-opaco: #118C5F;
+    --cor-branco-base: #eeece9;
+    --cor-verde-claro: #25D997;
+    --cor-verde-neon: #1DF2A4;
 
-    --cor-cafe-claro: #4B382A;
-    --cor-bege-claro: #f7f4f4;
-    --cor-laranja-cafe: #A67B5B;
-    --cor-branco: #FEFAF6;
 }
 
 
@@ -14,11 +17,29 @@ body {
     display: flex;
     flex-direction: column;
     font-family: 'Raleway', sans-serif;
-    background-color: var(--cor-bege-claro);
+    background-color: var(--cor-verde-escuro);
 }
 
 .navbar {
-    background-color: var(--cor-cafe-claro) !important;
+    background-color: var(--cor-verde-opaco) !important;
+}
+
+section {
+    color: var(--cor-branco-base);
+}
+
+
+.btn {
+    background-color: var(--cor-verde-neon);
+
+    border: none;
+    color: var(--cor-preto);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: var(--cor-cinza);
 }
 
 .lista-card {

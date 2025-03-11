@@ -1,17 +1,17 @@
 :root {
-    --cor-cafe-escuro: #1C1C1C;
-    --cor-cafe-claro: #4B382A;
-    --cor-cafe-claro-escuro: #6e6e6d;
-    --cor-cafe-mais-escuro: #eeece9;
-    --cor-bege-claro: #ececec;
-    --cor-laranja-cafe: #A67B5B;
-    --cor-branco: #FEFAF6;
+    --cor-preto: #0D0D0D;
+    --cor-verde-escuro: #012619;
+    --cor-cinza: #6e6d6d;
+    --cor-verde-opaco: #118C5F;
+    --cor-branco-base: #e9e9e9;
+    --cor-verde-claro: #25D997;
+
 }
 
 
 body {
     font-family: 'Raleway', sans-serif;
-    background-color: var(--cor-cafe-escuro);
+    background-color: var(--cor-verde-escuro);
 }
 
 
@@ -38,61 +38,55 @@ body {
 }
 
 .navbar {
-    background-color: var(--cor-cafe-claro) !important;
+    background-color: var(--cor-verde-opaco) !important;
 }
 
+
 .form-control {
-    background-color: var(--cor-bege-claro);
-    border-color: var(--cor-cafe-claro-escuro);
+    background-color: var(--cor-branco-base);
+    border-color: var(--cor-verde-escuro);
 }
 
 .form-control:focus {
-    border-color: var(--cor-cafe-mais-escuro);
-    box-shadow: 0 0 0 1px var(--cor-cafe-mais-escuro);
+    border-color: var(--cor-preto);
+    box-shadow: 0 0 0 1px var(--cor-preto);
 }
 
 
 .card-header {
-    background-color: var(--cor-cafe-claro) !important;
-    color: var(--cor-branco) !important;
+    background-color: var(--cor-verde-opaco) !important;
+    color: var(--cor-branco-base) !important;
     text-align: center;
     padding: 1rem;
 }
 
 
-.btn-primary {
-    background-color: var(--cor-cafe-escuro);
-    border-color: var(--cor-cafe-claro-escuro);
-}
-
-.btn-secondary {
-    background-color: var(--cor-cafe-claro);
-    border-color: var(--cor-cafe-claro-escuro);
-}
-
-.btn-primary:hover {
-    background-color: var(--cor-cafe-claro-escuro);
-    border-color: var(--cor-cafe-mais-escuro);
-}
-
 
 #userHelp,
 #passwordHelp {
-    color: var(--cor-laranja-cafe);
-}
-
-
-footer {
-    background-color: var(--cor-cafe-escuro);
-    color: var(--cor-bege-claro);
+    color: var(--cor-verde-neon);
 }
 
 
 .card-body {
-    background-color: var(--cor-bege-claro);
+    background-color: var(--cor-branco-base);
 }
 
+.btn {
+    background-color: var(--cor-verde-claro);
+    color: var(--cor-branco);
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
 
-.card {
-    border: 1px solid var(--cor-cafe-claro-escuro);
+.btn:hover {
+    background-color: var(--cor-verde-opaco);
+    color: var(--cor-branco-base);
 }
