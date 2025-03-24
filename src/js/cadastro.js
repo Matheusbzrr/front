@@ -20,21 +20,18 @@ document
     }
 
     try {
-      const response = await fetch(
-        "https://app-lista-compras.vercel.app/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name, email, password }),
-        }
-      );
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Erro ao cadastrar. Tente novamente.");
+        throw data; // Alterado: lança o próprio `data` (contendo os erros)
       }
 
       Swal.fire({
@@ -45,21 +42,27 @@ document
         color: "#242424",
         confirmButtonColor: "#4A2C2A",
       }).then(() => {
-        // Fechar o modal se ele existir
         const modalElement = document.getElementById("cadastroModal");
         if (modalElement) {
           const modal = bootstrap.Modal.getInstance(modalElement);
           if (modal) modal.hide();
         }
 
-        // Resetar o formulário
         document.getElementById("cadastro-form").reset();
       });
     } catch (error) {
+      let errorMessage =
+        error.message || "Ocorreu um erro inesperado. Tente novamente.";
+
+      // Se houver erros de validação do Zod, exibir todos em lista
+      if (error.errors && Array.isArray(error.errors)) {
+        errorMessage = error.errors.map((err) => `${err.message}`).join("\n");
+      }
+
       Swal.fire({
         icon: "error",
         title: "Erro!",
-        text: error.message || "Ocorreu um erro inesperado. Tente novamente.",
+        text: errorMessage,
         background: "#FEFAF6",
         color: "#242424",
         confirmButtonColor: "#4A2C2A",

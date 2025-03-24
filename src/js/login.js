@@ -7,16 +7,13 @@ document
     const formObject = Object.fromEntries(formData.entries());
 
     try {
-      const response = await fetch(
-        "https://app-lista-compras.vercel.app/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formObject),
-        }
-      );
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formObject),
+      });
 
       const data = await response.json();
       console.log("Resposta do backend:", data);
