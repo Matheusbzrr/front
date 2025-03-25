@@ -90,6 +90,11 @@ function criarCardLista(lista) {
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <h id="card-list-title" class="card-title">Lista de Compras</h>
+            <button class="btn btn-primary btn-sm me-2" onclick="abrirModalEdicaoSimples('${
+              lista.listId
+            }')" title="Editar lista">
+                <i class="bi bi-pencil"></i>
+              </button>
             <button class="btn btn-danger btn-sm" onclick="deletarLista('${
               lista.listId
             }')">
@@ -375,6 +380,177 @@ async function deletarLista(id) {
       icon: "error",
       confirmButtonColor: "#6e6d6d",
     });
+  }
+}
+
+let listaAtualEmEdicao = null;
+
+async function abrirModalEdicaoSimples(listId) {
+  try {
+    // Mostra loading
+    Swal.fire({
+      title: "Carregando...",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    // Busca os dados da lista
+    const response = await fetch(`${API_URL}/search`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) throw new Error("Erro ao carregar lista");
+
+    const listas = await response.json();
+    const lista = listas.find((l) => l.listId === listId);
+
+    if (!lista) throw new Error("Lista não encontrada");
+
+    // Armazena o ID da lista em edição
+    listaAtualEmEdicao = listId;
+
+    // Preenche o modal com os itens
+    const listaContainer = document.getElementById("listaEdicaoSimples");
+    listaContainer.innerHTML = "";
+
+    lista.items.forEach((item, index) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = `
+        <div class="row g-2 align-items-center">
+          <div class="col-md-5">
+            <input type="text" class="form-control form-control-sm" 
+                   value="${item.nameItem}" id="itemNome-${index}">
+          </div>
+          <div class="col-md-3">
+            <input type="number" step="0.01" class="form-control form-control-sm" 
+                   value="${item.amountItem}" id="itemQuantidade-${index}">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" id="itemUnidade-${index}">
+              <option value="Un" ${
+                item.measurementUnit === "Un" ? "selected" : ""
+              }>Un</option>
+              <option value="Kg" ${
+                item.measurementUnit === "Kg" ? "selected" : ""
+              }>Kg</option>
+              <option value="g" ${
+                item.measurementUnit === "g" ? "selected" : ""
+              }>g</option>
+              <option value="L" ${
+                item.measurementUnit === "L" ? "selected" : ""
+              }>L</option>
+              <option value="ml" ${
+                item.measurementUnit === "ml" ? "selected" : ""
+              }>ml</option>
+            </select>
+          </div>
+          <input type="hidden" id="itemId-${index}" value="${
+        item.itemId || ""
+      }">
+        </div>
+      `;
+      listaContainer.appendChild(li);
+    });
+
+    // Fecha o loading e abre o modal
+    Swal.close();
+    const modal = new bootstrap.Modal(
+      document.getElementById("modalEdicaoSimples")
+    );
+    modal.show();
+  } catch (error) {
+    Swal.fire({
+      title: "Erro!",
+      text: error.message || "Erro ao abrir edição",
+      icon: "error",
+      confirmButtonColor: "#6e6d6d",
+    });
+    console.error("Erro ao abrir edição:", error);
+  }
+}
+
+async function salvarEdicaoSimples() {
+  if (!listaAtualEmEdicao) return;
+
+  try {
+    // Coleta os itens editados
+    const listaContainer = document.getElementById("listaEdicaoSimples");
+    const itens = [];
+    const inputs = listaContainer.querySelectorAll("li");
+
+    inputs.forEach((li, index) => {
+      itens.push({
+        itemId: document.getElementById(`itemId-${index}`)?.value || null,
+        nameItem: document.getElementById(`itemNome-${index}`).value,
+        amountItem: parseFloat(
+          document.getElementById(`itemQuantidade-${index}`).value
+        ),
+        measurementUnit: document.getElementById(`itemUnidade-${index}`).value,
+      });
+    });
+
+    // Valida os itens
+    const itensInvalidos = itens.some(
+      (item) =>
+        !item.nameItem || isNaN(item.amountItem) || !item.measurementUnit
+    );
+
+    if (itensInvalidos) {
+      Swal.fire({
+        title: "Atenção!",
+        text: "Preencha todos os campos corretamente.",
+        icon: "warning",
+        confirmButtonColor: "#6e6d6d",
+      });
+      return;
+    }
+
+    // Mostra loading
+    Swal.fire({
+      title: "Salvando...",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    // Chama a API para atualizar
+    const response = await fetch(`${API_URL}/update/${listaAtualEmEdicao}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ items: itens }),
+    });
+
+    if (!response.ok) throw new Error("Erro ao salvar alterações");
+
+    // Sucesso
+    Swal.fire({
+      title: "Sucesso!",
+      text: "Lista atualizada com sucesso!",
+      icon: "success",
+      confirmButtonColor: "#118C5F",
+    });
+
+    // Fecha o modal e recarrega as listas
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("modalEdicaoSimples")
+    );
+    modal.hide();
+    carregarListasDoUsuario();
+  } catch (error) {
+    Swal.fire({
+      title: "Erro!",
+      text: error.message || "Erro ao salvar alterações",
+      icon: "error",
+      confirmButtonColor: "#6e6d6d",
+    });
+    console.error("Erro ao salvar edição:", error);
   }
 }
 
