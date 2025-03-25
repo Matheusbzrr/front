@@ -1,6 +1,5 @@
-
-let itemEditando = null; 
-let itensLista = []; 
+let itemEditando = null;
+let itensLista = [];
 
 function sair() {
   Swal.fire({
@@ -90,7 +89,7 @@ function criarCardLista(lista) {
       <div class="card h-100 lista-card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">Lista de Compras</h5>
+            <h id="card-list-title" class="card-title">Lista de Compras</h>
             <button class="btn btn-danger btn-sm" onclick="deletarLista('${
               lista.listId
             }')">
@@ -113,56 +112,61 @@ function criarCardLista(lista) {
   cardsContainer.insertAdjacentHTML("afterbegin", cardHTML);
 }
 
-
 function editarItem(index) {
   if (index < 0 || index >= itensLista.length) return;
-  
+
   itemEditando = index;
   const item = itensLista[index];
-  
+
   // Preenche o modal com os dados atuais
-  document.getElementById('editProduto').value = item.nameItem;
-  document.getElementById('editQuantidade').value = item.amountItem;
-  document.getElementById('editUnidade').value = item.measurementUnit;
-  
+  document.getElementById("editProduto").value = item.nameItem;
+  document.getElementById("editQuantidade").value = item.amountItem;
+  document.getElementById("editUnidade").value = item.measurementUnit;
+
   // Abre o modal
-  const modal = new bootstrap.Modal(document.getElementById('modalEdicao'));
+  const modal = new bootstrap.Modal(document.getElementById("modalEdicao"));
   modal.show();
 }
 
 // Adicione este evento depois que o DOM carregar
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('salvarEdicao').addEventListener('click', function() {
-    const produto = document.getElementById('editProduto').value.trim();
-    const quantidade = parseFloat(document.getElementById('editQuantidade').value);
-    const unidade = document.getElementById('editUnidade').value;
-    
-    // Validações
-    if (!produto) {
-      alert('Por favor, insira o nome do produto!');
-      return;
-    }
-    
-    if (isNaN(quantidade)) {
-      alert('Por favor, insira uma quantidade válida!');
-      return;
-    }
-    
-    // Atualiza o item
-    itensLista[itemEditando] = {
-      nameItem: produto,
-      amountItem: quantidade,
-      measurementUnit: unidade
-    };
-    
-    atualizarListaExibida();
-    
-    // Fecha o modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEdicao'));
-    modal.hide();
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("salvarEdicao")
+    .addEventListener("click", function () {
+      const produto = document.getElementById("editProduto").value.trim();
+      const quantidade = parseFloat(
+        document.getElementById("editQuantidade").value
+      );
+      const unidade = document.getElementById("editUnidade").value;
+
+      // Validações
+      if (!produto) {
+        alert("Por favor, insira o nome do produto!");
+        return;
+      }
+
+      if (isNaN(quantidade)) {
+        alert("Por favor, insira uma quantidade válida!");
+        return;
+      }
+
+      // Atualiza o item
+      itensLista[itemEditando] = {
+        nameItem: produto,
+        amountItem: quantidade,
+        measurementUnit: unidade,
+      };
+
+      atualizarListaExibida();
+
+      // Fecha o modal
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("modalEdicao")
+      );
+      modal.hide();
+    });
 });
-const API_URL = "http://localhost:3000/shopping";
+const API_URL = "app-lista-compras.vercel.app/shopping";
 const token = localStorage.getItem("token");
 
 if (!token) {

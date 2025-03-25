@@ -7,7 +7,7 @@ document
     const formObject = Object.fromEntries(formData.entries());
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("app-lista-compras.vercel.app/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,7 +28,7 @@ document
           background: "#FEFAF6",
           color: "#242424",
           confirmButtonColor: "#4A2C2A",
-          timer: 1500, 
+          timer: 1500,
           showConfirmButton: false,
         });
 
@@ -42,7 +42,7 @@ document
           text: data.message || "Tente o login novamente!",
           background: "#FEFAF6",
           color: "#242424",
-          confirmButtonColor: "#4A2C2A",
+          confirmButtonColor: "#118C5F",
         });
       }
     } catch (error) {

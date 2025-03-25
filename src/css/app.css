@@ -28,6 +28,10 @@ section {
     color: var(--cor-branco-base);
 }
 
+#card-list-title {
+    font-size: 1.5rem;
+    color: #000;
+}
 
 .btn {
     background-color: var(--cor-verde-neon);
@@ -88,27 +92,29 @@ section {
 #modalEdicao .modal-content {
     background-color: #FEFAF6;
     color: #242424;
-  }
-  
-  #modalEdicao .btn-primary {
+}
+
+#modalEdicao .btn-primary {
     background-color: #118C5F;
     border-color: #118C5F;
-  }
-  
-  #modalEdicao .btn-secondary {
+}
+
+#modalEdicao .btn-secondary {
     background-color: #6e6d6d;
     border-color: #6e6d6d;
-  }
+}
 
-  #modalEdicao {
-    z-index: 1060; /* Bootstrap modals usam 1050 por padrão, então precisamos de um valor maior */
-  }
-  
-  /* Se ainda persistir, adicione também: */
-  .modal-backdrop {
-    z-index: 1040; /* Garante que o backdrop fique atrás do modal de edição */
-  }
-  
+#modalEdicao {
+    z-index: 1060;
+    /* Bootstrap modals usam 1050 por padrão, então precisamos de um valor maior */
+}
+
+/* Se ainda persistir, adicione também: */
+.modal-backdrop {
+    z-index: 1040;
+    /* Garante que o backdrop fique atrás do modal de edição */
+}
+
 
 .modal-body {
     gap: 1rem;
