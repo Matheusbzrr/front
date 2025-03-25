@@ -31,7 +31,7 @@ document
       const data = await response.json();
 
       if (!response.ok) {
-        throw data; // Alterado: lança o próprio `data` (contendo os erros)
+        throw data; 
       }
 
       Swal.fire({

@@ -28,7 +28,7 @@ document
           background: "#FEFAF6",
           color: "#242424",
           confirmButtonColor: "#4A2C2A",
-          timer: 1500, // Espera 1.5s antes de redirecionar
+          timer: 1500, 
           showConfirmButton: false,
         });
 

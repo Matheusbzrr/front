@@ -1,3 +1,7 @@
+
+let itemEditando = null; 
+let itensLista = []; 
+
 function sair() {
   Swal.fire({
     title: "Tem certeza que deseja sair?",
@@ -23,6 +27,141 @@ function sair() {
   return false;
 }
 
+function adicionarItem() {
+  const produto = document.getElementById("produtoInput").value.trim();
+  const quantidade = parseFloat(
+    document.getElementById("quantidadeInput").value
+  );
+  const unidade = document.getElementById("unidadeSelect").value;
+
+  const novoItem = {
+    nameItem: produto,
+    amountItem: quantidade,
+    measurementUnit: unidade,
+  };
+
+  itensLista.push(novoItem);
+  atualizarListaExibida();
+
+  // Limpa os inputs após adicionar
+  document.getElementById("produtoInput").value = "";
+  document.getElementById("quantidadeInput").value = "1";
+  document.getElementById("produtoInput").focus();
+}
+
+function atualizarListaExibida() {
+  const listaItens = document.querySelector("#listaItens ul");
+  listaItens.innerHTML = "";
+
+  itensLista.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.classList.add(
+      "list-group-item",
+      "d-flex",
+      "justify-content-between",
+      "align-items-center"
+    );
+
+    li.innerHTML = `
+      <span><strong>${item.nameItem}</strong> - ${item.amountItem} ${item.measurementUnit}</span>
+      <div>
+        <button class="btn btn-primary btn-sm me-2" title="Editar item" onclick="editarItem(${index})">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-danger btn-sm" title="Remover item" onclick="removerItem(${index})">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `;
+
+    listaItens.appendChild(li);
+  });
+}
+
+function removerItem(index) {
+  itensLista.splice(index, 1);
+  atualizarListaExibida();
+}
+
+function criarCardLista(lista) {
+  const cardsContainer = document.getElementById("cardsContainer");
+  const cardHTML = `
+    <div class="col" id="card-${lista.listId}">
+      <div class="card h-100 lista-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Lista de Compras</h5>
+            <button class="btn btn-danger btn-sm" onclick="deletarLista('${
+              lista.listId
+            }')">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <p class="card-text"><small class="text-muted">Criada em: ${new Date(
+            lista.createdAt
+          ).toLocaleDateString("pt-BR")}</small></p>
+        </div>
+        <div class="card-footer bg-transparent">
+          <button class="btn btn-link" onclick="abrirModalLista('${
+            lista.listId
+          }')">
+            Ver Itens <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  cardsContainer.insertAdjacentHTML("afterbegin", cardHTML);
+}
+
+
+function editarItem(index) {
+  if (index < 0 || index >= itensLista.length) return;
+  
+  itemEditando = index;
+  const item = itensLista[index];
+  
+  // Preenche o modal com os dados atuais
+  document.getElementById('editProduto').value = item.nameItem;
+  document.getElementById('editQuantidade').value = item.amountItem;
+  document.getElementById('editUnidade').value = item.measurementUnit;
+  
+  // Abre o modal
+  const modal = new bootstrap.Modal(document.getElementById('modalEdicao'));
+  modal.show();
+}
+
+// Adicione este evento depois que o DOM carregar
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('salvarEdicao').addEventListener('click', function() {
+    const produto = document.getElementById('editProduto').value.trim();
+    const quantidade = parseFloat(document.getElementById('editQuantidade').value);
+    const unidade = document.getElementById('editUnidade').value;
+    
+    // Validações
+    if (!produto) {
+      alert('Por favor, insira o nome do produto!');
+      return;
+    }
+    
+    if (isNaN(quantidade)) {
+      alert('Por favor, insira uma quantidade válida!');
+      return;
+    }
+    
+    // Atualiza o item
+    itensLista[itemEditando] = {
+      nameItem: produto,
+      amountItem: quantidade,
+      measurementUnit: unidade
+    };
+    
+    atualizarListaExibida();
+    
+    // Fecha o modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEdicao'));
+    modal.hide();
+  });
+});
 const API_URL = "http://localhost:3000/shopping";
 const token = localStorage.getItem("token");
 
@@ -84,79 +223,6 @@ async function carregarListasDoUsuario() {
       confirmButtonColor: "#6e6d6d",
     });
   }
-}
-
-let itensLista = []; // Lista temporária de itens antes do envio
-
-function adicionarItem() {
-  const produto = document.getElementById("produtoInput").value.trim();
-  const quantidade = parseFloat(
-    document.getElementById("quantidadeInput").value
-  );
-  const unidade = document.getElementById("unidadeSelect").value;
-
-  if (!produto) {
-    Swal.fire({
-      title: "Atenção!",
-      text: "Por favor, insira o nome do produto!",
-      icon: "warning",
-      confirmButtonColor: "#6e6d6d",
-    });
-    return;
-  }
-
-  if (isNaN(quantidade)) {
-    Swal.fire({
-      title: "Atenção!",
-      text: "Por favor, insira uma quantidade válida!",
-      icon: "warning",
-      confirmButtonColor: "#6e6d6d",
-    });
-    return;
-  }
-
-  const novoItem = {
-    nameItem: produto,
-    amountItem: quantidade,
-    measurementUnit: unidade,
-  };
-
-  itensLista.push(novoItem);
-  atualizarListaExibida();
-
-  // Limpa os inputs após adicionar
-  document.getElementById("produtoInput").value = "";
-  document.getElementById("quantidadeInput").value = "1";
-  document.getElementById("produtoInput").focus();
-}
-
-function atualizarListaExibida() {
-  const listaItens = document.querySelector("#listaItens ul");
-  listaItens.innerHTML = "";
-
-  itensLista.forEach((item, index) => {
-    const li = document.createElement("li");
-    li.classList.add(
-      "list-group-item",
-      "d-flex",
-      "justify-content-between",
-      "align-items-center"
-    );
-
-    li.innerHTML = `
-      <span><strong>${item.nameItem}</strong> - ${item.amountItem} ${item.measurementUnit}</span>
-      <button class="btn btn-danger btn-sm" title="Remover item" onclick="removerItem(${index})">
-        <i class="bi bi-trash"></i>
-      </button>
-    `;
-
-    listaItens.appendChild(li);
-  });
-}
-
-function removerItem(index) {
-  itensLista.splice(index, 1);
-  atualizarListaExibida();
 }
 
 async function exportarLista() {
@@ -308,36 +374,6 @@ async function deletarLista(id) {
   }
 }
 
-function criarCardLista(lista) {
-  const cardsContainer = document.getElementById("cardsContainer");
-  const cardHTML = `
-    <div class="col" id="card-${lista.listId}">
-      <div class="card h-100 lista-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">Lista de Compras</h5>
-            <button class="btn btn-danger btn-sm" onclick="deletarLista('${
-              lista.listId
-            }')">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-          <p class="card-text"><small class="text-muted">Criada em: ${new Date(
-            lista.createdAt
-          ).toLocaleDateString("pt-BR")}</small></p>
-        </div>
-        <div class="card-footer bg-transparent">
-          <button class="btn btn-link" onclick="abrirModalLista('${
-            lista.listId
-          }')">
-            Ver Itens <i class="bi bi-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>`;
-  cardsContainer.insertAdjacentHTML("afterbegin", cardHTML);
-}
-
 async function abrirModalLista(id) {
   try {
     const loadingSwal = Swal.fire({
@@ -404,7 +440,6 @@ async function abrirModalLista(id) {
   }
 }
 
-// Evento para limpar o modal quando é fechado
 document
   .getElementById("staticBackdrop")
   .addEventListener("hidden.bs.modal", function () {
@@ -415,11 +450,8 @@ document
     document.getElementById("unidadeSelect").value = "Un";
   });
 
-// Inicializa ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
   carregarListasDoUsuario();
-
-  // Foca no campo de produto quando o modal é aberto
   document
     .getElementById("staticBackdrop")
     .addEventListener("shown.bs.modal", function () {

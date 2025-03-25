@@ -4,14 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lista Ae</title>
-
+    <link rel="preconnect" href="http://localhost:3000">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
     />
     <link
       rel="stylesheet"
@@ -23,7 +20,7 @@
     <header>
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-          <a class="navbar-brand" href="/src/pages/app.html">Lista Ae! 🛒</a>
+          <a class="navbar-brand" href="">Lista Ae! 🛒</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -35,14 +32,6 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a class="nav-link active" href="/src/pages/app.html">Início</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/src/pages/localization.html"
-                  >Mercados</a
-                >
-              </li>
               <li id="logout-btn" class="nav-item">
                 <a class="nav-link" href="#" onclick="return sair();">Sair</a>
               </li>
@@ -101,6 +90,41 @@
             </div>
             <div class="modal-body">
               <ul id="listaItensModal" class="list-group"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Edição -->
+      <div class="modal fade" id="modalEdicao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Editar Item</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Produto</label>
+                <input type="text" id="editProduto" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Quantidade</label>
+                <input type="number" id="editQuantidade" class="form-control" step="0.01">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Unidade</label>
+                <select id="editUnidade" class="form-select">
+                  <option value="Un">Unidade (Un)</option>
+                  <option value="Kg">Quilograma (Kg)</option>
+                  <option value="g">Grama (g)</option>
+                  <option value="L">Litro (L)</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-primary" id="salvarEdicao">Salvar</button>
             </div>
           </div>
         </div>
@@ -186,9 +210,8 @@
         </div>
       </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/src/js/app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" async></script>
   </body>
 </html>
