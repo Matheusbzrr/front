@@ -23,12 +23,6 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // 1️⃣ Evita cache de login/logout
-  if (url.pathname.startsWith("/login") || url.pathname.startsWith("/logout")) {
-    return event.respondWith(fetch(request));
-  }
-
-  // 2️⃣ Armazena apenas requisições GET no cache
   if (request.method !== "GET") {
     return event.respondWith(fetch(request));
   }
