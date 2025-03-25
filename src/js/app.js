@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
       modal.hide();
     });
 });
-const API_URL = "app-lista-compras.vercel.app/shopping";
+const API_URL = "https://app-lista-compras.onrender.com/shopping";
 const token = localStorage.getItem("token");
 
 if (!token) {

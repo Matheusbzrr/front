@@ -20,7 +20,7 @@ document
     }
 
     try {
-      const response = await fetch("app-lista-compras.vercel.app/auth/register", {
+      const response = await fetch("https://app-lista-compras.onrender.com/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
