@@ -6,7 +6,6 @@
     --cor-branco-base: #eeece9;
     --cor-verde-claro: #25D997;
     --cor-verde-neon: #1DF2A4;
-
 }
 
 
@@ -88,34 +87,16 @@ section {
     border-radius: 4px;
 }
 
-/* Estilos para o modal de edição */
-#modalEdicao .modal-content {
-    background-color: #FEFAF6;
-    color: #242424;
-}
 
-#modalEdicao .btn-primary {
-    background-color: #118C5F;
-    border-color: #118C5F;
+#listaItensModal {
+    max-height: 60vh;
+    overflow-y: auto;
 }
-
-#modalEdicao .btn-secondary {
-    background-color: #6e6d6d;
-    border-color: #6e6d6d;
-}
-
-#modalEdicao {
-    z-index: 1060;
-    /* Bootstrap modals usam 1050 por padrão, então precisamos de um valor maior */
-}
-
-/* Se ainda persistir, adicione também: */
-.modal-backdrop {
-    z-index: 1040;
-    /* Garante que o backdrop fique atrás do modal de edição */
-}
-
 
 .modal-body {
     gap: 1rem;
+}
+
+#h5-card {
+    color: var(--cor-preto) !important;
 }

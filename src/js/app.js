@@ -1,392 +1,23 @@
-let itemEditando = null;
-let itensLista = [];
+import Alertas from "./alerts.js";
+const API_URL = "https://app-lista-compras.onrender.com/shopping";
+const token = localStorage.getItem("token");
+let listas = [];
+let currentListId = null;
+let currentEditItemId = null;
 
 function sair() {
-  Swal.fire({
-    title: "Tem certeza que deseja sair?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#6e6d6d",
-    cancelButtonColor: "#118C5F",
-    confirmButtonText: "Sim, sair!",
-    cancelButtonText: "Ficar na listinha",
-    background: "#FEFAF6",
-    color: "#242424",
-  }).then((result) => {
+  Alertas.confirmacao("Fica na listinha ai pô").then((result) => {
     if (result.isConfirmed) {
-      // Remove o token do localStorage
       localStorage.removeItem("token");
-
-      // Redireciona para a página inicial
       window.location.href = "/index.html";
     }
   });
-
-  // Prevenir que o link seja seguido imediatamente
   return false;
-}
-
-function adicionarItem() {
-  const produto = document.getElementById("produtoInput").value.trim();
-  const quantidade = parseFloat(
-    document.getElementById("quantidadeInput").value
-  );
-  const unidade = document.getElementById("unidadeSelect").value;
-
-  const novoItem = {
-    nameItem: produto,
-    amountItem: quantidade,
-    measurementUnit: unidade,
-  };
-
-  itensLista.push(novoItem);
-  atualizarListaExibida();
-
-  // Limpa os inputs após adicionar
-  document.getElementById("produtoInput").value = "";
-  document.getElementById("quantidadeInput").value = "1";
-  document.getElementById("produtoInput").focus();
-}
-
-function atualizarListaExibida() {
-  const listaItens = document.querySelector("#listaItens ul");
-  listaItens.innerHTML = "";
-
-  itensLista.forEach((item, index) => {
-    const li = document.createElement("li");
-    li.classList.add(
-      "list-group-item",
-      "d-flex",
-      "justify-content-between",
-      "align-items-center"
-    );
-
-    li.innerHTML = `
-      <span><strong>${item.nameItem}</strong> - ${item.amountItem} ${item.measurementUnit}</span>
-      <div>
-        <button class="btn btn-primary btn-sm me-2" title="Editar item" onclick="editarItem(${index})">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn btn-danger btn-sm" title="Remover item" onclick="removerItem(${index})">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
-    `;
-
-    listaItens.appendChild(li);
-  });
-}
-
-function removerItem(index) {
-  itensLista.splice(index, 1);
-  atualizarListaExibida();
-}
-
-function criarCardLista(lista) {
-  const cardsContainer = document.getElementById("cardsContainer");
-  const cardHTML = `
-    <div class="col" id="card-${lista.listId}">
-      <div class="card h-100 lista-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h id="card-list-title" class="card-title">Lista de Compras</h>
-            <button class="btn btn-danger btn-sm" onclick="deletarLista('${
-              lista.listId
-            }')">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
-          <p class="card-text"><small class="text-muted">Criada em: ${new Date(
-            lista.createdAt
-          ).toLocaleDateString("pt-BR")}</small></p>
-        </div>
-        <div class="card-footer bg-transparent">
-          <button class="btn btn-link" onclick="abrirModalLista('${
-            lista.listId
-          }')">
-            Ver Itens <i class="bi bi-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>`;
-  cardsContainer.insertAdjacentHTML("afterbegin", cardHTML);
-}
-
-function editarItem(index) {
-  if (index < 0 || index >= itensLista.length) return;
-
-  itemEditando = index;
-  const item = itensLista[index];
-
-  // Preenche o modal com os dados atuais
-  document.getElementById("editProduto").value = item.nameItem;
-  document.getElementById("editQuantidade").value = item.amountItem;
-  document.getElementById("editUnidade").value = item.measurementUnit;
-
-  // Abre o modal
-  const modal = new bootstrap.Modal(document.getElementById("modalEdicao"));
-  modal.show();
-}
-
-// Adicione este evento depois que o DOM carregar
-document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("salvarEdicao")
-    .addEventListener("click", function () {
-      const produto = document.getElementById("editProduto").value.trim();
-      const quantidade = parseFloat(
-        document.getElementById("editQuantidade").value
-      );
-      const unidade = document.getElementById("editUnidade").value;
-
-      // Validações
-      if (!produto) {
-        alert("Por favor, insira o nome do produto!");
-        return;
-      }
-
-      if (isNaN(quantidade)) {
-        alert("Por favor, insira uma quantidade válida!");
-        return;
-      }
-
-      // Atualiza o item
-      itensLista[itemEditando] = {
-        nameItem: produto,
-        amountItem: quantidade,
-        measurementUnit: unidade,
-      };
-
-      atualizarListaExibida();
-
-      // Fecha o modal
-      const modal = bootstrap.Modal.getInstance(
-        document.getElementById("modalEdicao")
-      );
-      modal.hide();
-    });
-});
-const API_URL = "https://app-lista-compras.onrender.com/shopping";
-const token = localStorage.getItem("token");
-
-if (!token) {
-  Swal.fire({
-    title: "Atenção!",
-    text: "Você precisa estar logado para acessar suas listas!",
-    icon: "warning",
-    confirmButtonColor: "#6e6d6d",
-  }).then(() => {
-    window.location.href = "/login.html";
-  });
 }
 
 async function carregarListasDoUsuario() {
   try {
-    // Exibe o alerta de carregamento e armazena a referência
-    Swal.fire({
-      title: "Carregando listas...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    // Realiza a requisição para buscar as listas
-    const response = await fetch(`${API_URL}/search`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Adiciona um delay de 1.5s para melhor experiência do usuário
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Fecha o Swal de carregamento
-    Swal.close();
-
-    if (!response.ok) {
-      throw new Error("Erro ao carregar listas");
-    }
-
-    const listas = await response.json();
-    document.getElementById("cardsContainer").innerHTML = ""; // Limpa os cards existentes
-    listas.forEach(criarCardLista);
-  } catch (error) {
-    // Fecha o Swal de carregamento antes de exibir erro
-    Swal.close();
-
-    console.error("Erro ao carregar listas:", error);
-
-    // Exibe alerta de erro
-    await Swal.fire({
-      title: "Erro!",
-      text: "Ocorreu um erro ao carregar suas listas.",
-      icon: "error",
-      confirmButtonColor: "#6e6d6d",
-    });
-  }
-}
-
-async function exportarLista() {
-  if (itensLista.length === 0) {
-    await Swal.fire({
-      title: "Atenção!",
-      text: "A lista está vazia! Adicione itens antes de enviar.",
-      icon: "warning",
-      confirmButtonColor: "#6e6d6d",
-    });
-    return;
-  }
-
-  const listaCompleta = { items: itensLista };
-
-  // Exibe o alerta de carregamento e armazena a referência
-  Swal.fire({
-    title: "Salvando lista...",
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
-
-  try {
-    const response = await fetch(`${API_URL}/create`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(listaCompleta),
-    });
-
-    // Adiciona um delay de 1.5s para melhor experiência do usuário
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Fecha o Swal de carregamento
-    Swal.close();
-
-    if (!response.ok) {
-      throw new Error("Erro ao enviar lista");
-    }
-
-    // Fecha o modal antes de exibir o sucesso
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("staticBackdrop")
-    );
-    modal.hide();
-
-    // Aguarda um pequeno delay para evitar sobreposição visual
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Exibe alerta de sucesso
-    await Swal.fire({
-      title: "Sucesso!",
-      text: "Lista criada com sucesso!",
-      icon: "success",
-      confirmButtonColor: "#118C5F",
-    });
-
-    // Limpa a lista temporária
-    itensLista = [];
-    document.querySelector("#listaItens ul").innerHTML = "";
-
-    // Recarrega as listas do usuário
-    await carregarListasDoUsuario();
-  } catch (error) {
-    // Fecha o Swal de carregamento antes de exibir erro
-    Swal.close();
-
-    console.error("Erro ao enviar lista:", error);
-
-    // Exibe alerta de erro
-    await Swal.fire({
-      title: "Erro!",
-      text: "Ocorreu um erro ao criar a lista.",
-      icon: "error",
-      confirmButtonColor: "#6e6d6d",
-    });
-  }
-}
-
-async function deletarLista(id) {
-  // Confirmação de exclusão
-  const result = await Swal.fire({
-    title: "Tem certeza?",
-    text: "Você não poderá reverter isso!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#6e6d6d",
-    cancelButtonColor: "#118C5F",
-    confirmButtonText: "Sim, excluir!",
-    cancelButtonText: "Cancelar",
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    // Exibe o alerta de carregamento de exclusão
-    const loadingSwal = Swal.fire({
-      title: "Excluindo lista...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    // Realiza a requisição para excluir a lista
-    const response = await fetch(`${API_URL}/delete/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    // Adiciona um delay de 1.5 segundos para melhorar a experiência do usuário
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Fecha o Swal de carregamento
-    Swal.close();
-
-    if (!response.ok) {
-      throw new Error("Erro ao excluir lista");
-    }
-
-    // Exibe alerta de sucesso
-    await Swal.fire({
-      title: "Excluído!",
-      text: "Sua lista foi excluída.",
-      icon: "success",
-      confirmButtonColor: "#118C5F",
-    });
-
-    // Remove o card da lista na interface
-    document.getElementById(`card-${id}`).remove();
-  } catch (error) {
-    // Fecha o Swal de carregamento em caso de erro
-    Swal.close();
-
-    console.error("Erro ao excluir lista:", error);
-    // Exibe alerta de erro
-    Swal.fire({
-      title: "Erro!",
-      text: "Ocorreu um erro ao excluir a lista.",
-      icon: "error",
-      confirmButtonColor: "#6e6d6d",
-    });
-  }
-}
-
-async function abrirModalLista(id) {
-  try {
-    const loadingSwal = Swal.fire({
-      title: "Carregando lista...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    Alertas.loading("Carregando listas de usuário...");
 
     const response = await fetch(`${API_URL}/search`, {
       method: "GET",
@@ -396,71 +27,344 @@ async function abrirModalLista(id) {
       },
     });
 
-    await loadingSwal.close();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    Swal.close();
 
-    if (!response.ok) {
-      throw new Error("Erro ao carregar lista");
-    }
+    if (!response.ok) throw new Error("Erro ao carregar listas");
 
-    const listas = await response.json();
-    console.log(listas);
-    const lista = listas.find((l) => l.listId === id);
+    listas = await response.json();
+    const cardsContainer = document.getElementById("cardsContainer");
+    cardsContainer.innerHTML = "";
 
-    if (!lista) {
-      Swal.fire({
-        title: "Erro!",
-        text: "Lista não encontrada!",
-        icon: "error",
-        confirmButtonColor: "#6e6d6d",
-      });
+    if (!listas || listas.length === 0) {
+      cardsContainer.innerHTML = `
+        <div class="col-12 text-center py-4">
+          <h5 class="">Você ainda não tem listas criadas.</h5>
+          <p class="">Clique no botão a baixo e crie sua primeira lista de compras.</p>
+        </div>
+      `;
       return;
     }
 
-    document.getElementById("listaData").textContent = new Date(
-      lista.createdAt
-    ).toLocaleDateString("pt-BR");
-    const listaItens = document.getElementById("listaItensModal");
-    listaItens.innerHTML = "";
+    const cardTemplate = document.getElementById("cardTemplate");
 
-    lista.items.forEach((item, index) => {
-      const li = document.createElement("li");
-      li.className = "list-group-item";
-      li.textContent = `${index + 1}. ${item.nameItem} - ${item.amountItem} ${
-        item.measurementUnit
-      }`;
-      listaItens.appendChild(li);
+    listas.forEach((lista) => {
+      const cardClone = cardTemplate.content.cloneNode(true);
+      const cardElement = cardClone.querySelector(".col");
+      cardElement.id = `card-listId-${lista.listId}`;
+      cardElement.querySelector(".card-title").textContent =
+        lista.nome || "Lista de Compras";
+      cardElement.querySelector(
+        ".data-criacao"
+      ).textContent = `Criada em: ${new Date(
+        lista.createdAt
+      ).toLocaleDateString("pt-BR")}`;
+      const editarBtn = cardElement.querySelector(".editar-btn");
+      const deletarBtn = cardElement.querySelector(".deletar-btn");
+      const verItensBtn = cardElement.querySelector(".ver-itens-btn");
+
+      editarBtn.addEventListener("click", () => editarLista(lista.listId));
+      deletarBtn.addEventListener("click", () => deletarLista(lista.listId));
+      verItensBtn.addEventListener("click", () => verItensLista(lista.listId));
+
+      cardsContainer.appendChild(cardClone);
     });
-
-    const modal = new bootstrap.Modal(document.getElementById("listaModal"));
-    modal.show();
   } catch (error) {
-    console.error("Erro ao abrir lista:", error);
-    Swal.fire({
-      title: "Erro!",
-      text: "Ocorreu um erro ao carregar a lista.",
-      icon: "error",
-      confirmButtonColor: "#6e6d6d",
-    });
+    Swal.close();
+    console.error("Erro ao carregar listas:", error);
+    await Alertas.erro("Ocorreu um erro ao carregar suas listas.");
   }
 }
 
+function verItensLista(listId, editMode = false) {
+  currentListId = listId;
+  const lista = listas.find((l) => l.listId === listId);
 
+  if (!lista) {
+    Alertas.erro("Lista não encontrada");
+    return;
+  }
+
+  document.getElementById("listaData").textContent = new Date(
+    lista.createdAt
+  ).toLocaleDateString("pt-BR");
+
+  updateItemsList(lista.items);
+
+  const modal = new bootstrap.Modal(document.getElementById("listaModal"));
+  modal.show();
+}
+async function editarLista(listId) {
+  await carregarListasDoUsuario();
+  verItensLista(listId, true);
+}
+function updateItemsList(items) {
+  const container = document.getElementById("listaItensModal");
+  container.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `<li class="list-group-item text-muted">Nenhum item na lista</li>`;
+    return;
+  }
+
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.className =
+      "list-group-item d-flex justify-content-between align-items-center";
+    li.innerHTML = `
+      <span>${item.nameItem} - ${item.amountItem} ${item.measurementUnit}</span>
+      <div>
+        <button onclick="startEditItem('${item.itemId}')" class="btn btn-sm btn-warning me-1">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button onclick="deleteItem('${item.itemId}')" class="btn btn-sm btn-danger">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `;
+    container.appendChild(li);
+  });
+}
+
+function showAddItemForm() {
+  currentEditItemId = null;
+  document.getElementById("editArea").style.display = "block";
+  document.getElementById("editNome").value = "";
+  document.getElementById("editQuantidade").value = "1";
+  document.getElementById("editUnidade").value = "Un";
+  document.getElementById("editNome").focus();
+}
+
+function startEditItem(itemId) {
+  const lista = listas.find((l) => l.listId === currentListId);
+  const item = lista.items.find((i) => i.itemId === itemId);
+
+  if (!item) return;
+
+  currentEditItemId = itemId;
+  document.getElementById("editArea").style.display = "block";
+  document.getElementById("editNome").value = item.nameItem;
+  document.getElementById("editQuantidade").value = item.amountItem;
+  document.getElementById("editUnidade").value = item.measurementUnit;
+}
+
+function cancelEdit() {
+  document.getElementById("editArea").style.display = "none";
+}
 
 document
-  .getElementById("staticBackdrop")
-  .addEventListener("hidden.bs.modal", function () {
-    itensLista = [];
-    document.querySelector("#listaItens ul").innerHTML = "";
-    document.getElementById("produtoInput").value = "";
-    document.getElementById("quantidadeInput").value = "1";
-    document.getElementById("unidadeSelect").value = "Un";
+  .getElementById("saveEditBtn")
+  .addEventListener("click", async function () {
+    const name = document.getElementById("editNome").value.trim();
+    const amount = document.getElementById("editQuantidade").value;
+    const unit = document.getElementById("editUnidade").value;
+
+    if (!name || !amount) {
+      Alertas.erro("Preencha todos os campos");
+      return;
+    }
+
+    const payload = {
+      nameItem: name,
+      amountItem: parseFloat(amount),
+      measurementUnit: unit,
+    };
+
+    if (currentEditItemId) {
+      payload.itemId = currentEditItemId;
+    }
+
+    try {
+      const endpoint = currentEditItemId
+        ? `${API_URL}/update/${currentListId}`
+        : `${API_URL}/update/${currentListId}`;
+
+      const method = "PUT";
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro na operação");
+      }
+      await Alertas.sucesso(
+        currentEditItemId ? "Item atualizado!" : "Item adicionado!"
+      );
+      bootstrap.Modal.getInstance(document.getElementById("listaModal")).hide();
+
+      document.getElementById("editArea").style.display = "none";
+      carregarListasDoUsuario();
+    } catch (error) {
+      console.error("Erro:", error);
+      Alertas.erro("Operação falhou");
+    }
   });
 
-document.addEventListener("DOMContentLoaded", () => {
-  carregarListasDoUsuario();
-  document
-    .getElementById("staticBackdrop")
-    .addEventListener("shown.bs.modal", function () {
-      document.getElementById("produtoInput").focus();
+async function deleteItem(itemId) {
+  const result = await Alertas.confirmacao(
+    "Tem certeza que deseja excluir este item?"
+  );
+
+  if (!result.isConfirmed) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/item/${currentListId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ itemId }),
     });
-});
+
+    if (!response.ok) {
+      throw new Error("Erro ao excluir");
+    }
+
+    await Alertas.sucesso("Item excluído!");
+    bootstrap.Modal.getInstance(document.getElementById("listaModal")).hide();
+    await carregarListasDoUsuario();
+  } catch (error) {
+    console.error("Erro:", error);
+    await Alertas.erro("Falha ao excluir item");
+  }
+}
+async function deletarLista(listId) {
+  Alertas.confirmacao("Tem certeza que deseja deletar esta lista?").then(
+    async (result) => {
+      if (result.isConfirmed) {
+        try {
+          Alertas.loading("Deletando lista...");
+          const response = await fetch(`${API_URL}/delete/${listId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          Swal.close();
+          await Alertas.sucesso("Lista deletada com sucesso!");
+          carregarListasDoUsuario();
+        } catch (error) {
+          Swal.close();
+          console.error("Erro ao deletar lista:", error);
+          await Alertas.erro("Ocorreu um erro ao deletar a lista.");
+        }
+      }
+    }
+  );
+}
+
+async function exportarLista() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    Alertas.erro("Usuário não autenticado!");
+    return;
+  }
+
+  const listaItens = document.querySelectorAll("#listaItens ul li");
+
+  if (listaItens.length === 0) {
+    Alertas.erro("Adicione pelo menos um item antes de salvar a lista.");
+    return;
+  }
+
+  const items = Array.from(listaItens).map((li) => {
+    return {
+      nameItem: li.dataset.name,
+      amountItem: parseFloat(li.dataset.amount),
+      measurementUnit: li.dataset.unit,
+    };
+  });
+
+  const payload = { items };
+
+  try {
+    Alertas.loading("Salvando lista...");
+
+    const response = await fetch(`${API_URL}/shopping/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (!response.ok) throw new Error("Erro ao salvar a lista");
+
+    await Alertas.sucesso("Lista criada!");
+    bootstrap.Modal.getInstance(
+      document.getElementById("modalCriarNovaLista")
+    ).hide();
+
+    carregarListasDoUsuario();
+    document
+      .getElementById("modalCriarNovaLista")
+      .addEventListener("hidden.bs.modal", () => {
+        document.querySelector("#listaItens ul").innerHTML = "";
+      });
+  } catch (error) {
+    Swal.close();
+    console.error("Erro ao salvar a lista:", error);
+    Alertas.erro("Ocorreu um erro ao salvar sua lista.");
+  }
+}
+
+function adicionarItem() {
+  const produtoInput = document.getElementById("produtoInput");
+  const quantidadeInput = document.getElementById("quantidadeInput");
+  const unidadeSelect = document.getElementById("unidadeSelect");
+  const listaItens = document.querySelector("#listaItens ul");
+
+  const nomeProduto = produtoInput.value.trim();
+  const quantidade = parseFloat(quantidadeInput.value);
+  const unidade = unidadeSelect.value;
+
+  if (!nomeProduto || quantidade <= 0) {
+    Alertas.erro("Preencha o nome e uma quantidade válida!");
+    return;
+  }
+
+  const li = document.createElement("li");
+  li.classList.add(
+    "list-group-item",
+    "d-flex",
+    "justify-content-between",
+    "align-items-center"
+  );
+  li.dataset.name = nomeProduto;
+  li.dataset.amount = quantidade;
+  li.dataset.unit = unidade;
+  li.innerHTML = `
+    ${nomeProduto} - ${quantidade} ${unidade}
+    <button class="btn btn-danger btn-sm" onclick="removerItem(this)">❌</button>
+  `;
+
+  listaItens.appendChild(li);
+  produtoInput.value = "";
+  quantidadeInput.value = "1";
+}
+function removerItem(botao) {
+  botao.parentElement.remove();
+}
+
+window.exportarLista = exportarLista;
+window.adicionarItem = adicionarItem;
+window.showAddItemForm = showAddItemForm;
+window.sair = sair;
+window.startEditItem = startEditItem;
+window.cancelEdit = cancelEdit;
+window.removerItem = removerItem;
+window.deleteItem = deleteItem;
+carregarListasDoUsuario();
