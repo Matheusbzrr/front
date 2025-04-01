@@ -290,7 +290,7 @@ async function exportarLista() {
   try {
     Alertas.loading("Salvando lista...");
 
-    const response = await fetch(`${API_URL}/shopping/create`, {
+    const response = await fetch(`${API_URL}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
