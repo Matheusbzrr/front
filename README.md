@@ -21,11 +21,11 @@ A aplicação consome uma **API REST** desenvolvida em **Node.js**, responsável
 - **HTML5** – Estrutura da aplicação.
 - **CSS3** – Estilização personalizada.
 - **Bootstrap** – Estilização e layout responsivo com componentes prontos.
-- **JavaScript (ES6+)** – Manipulação da lista, eventos, integração com a API.
+- **JavaScript** – Manipulação da lista, eventos, integração com a API.
 - **LocalStorage** – Armazenamento de tokens e dados localmente no navegador.
 - **PWA** – Para funcionamento como aplicativo instalável e acesso offline.
 - **API Back-end** – Autenticação e persistência de dados via API:  
-  🔗 [`https://front-gold-sigma.vercel.app/`](https://front-gold-sigma.vercel.app/)
+  🔗 (https://github.com/Matheusbzrr/app-lista-compras)
 
 ---
 
