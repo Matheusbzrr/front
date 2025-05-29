@@ -301,6 +301,13 @@ async function exportarLista() {
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    const data = await response.json();
+
+    if (data.offline) {
+      window.location.href = "/offline.html";
+      return;
+    }
+
     if (!response.ok) throw new Error("Erro ao salvar a lista");
 
     await Alertas.sucesso("Lista criada!");

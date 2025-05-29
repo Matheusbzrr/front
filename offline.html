@@ -7,5 +7,15 @@
   </head>
   <body>
     <p>ok ok</p>
+    <script>
+      function verificarOnline() {
+        if (navigator.onLine) {
+          window.location.href = "/src/pages/app.html";
+        }
+      }
+      verificarOnline();
+      window.addEventListener("online", verificarOnline);
+      setInterval(verificarOnline, 3000);
+    </script>
   </body>
 </html>
