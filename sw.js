@@ -15,6 +15,7 @@ const ASSETS_TO_CACHE = [
   "/src/css/app.css",
   "/src/js/app.js",
   "/offline.html",
+  "/src/js/idb/index-min.js",  // cache da lib idb local
 ];
 
 // Cache dos arquivos estáticos
@@ -39,20 +40,23 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// IndexedDB via IDB (biblioteca para simplificar)
-importScripts("https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js");
+// Importa a lib IDB local
+importScripts("/src/js/idb/index-min.js");
 
+// Cria/open IndexedDB com IDB
 const dbPromise = idb.openDB("ListaComprasDB", 1, {
   upgrade(db) {
-    db.createObjectStore("pendentes", { autoIncrement: true });
+    if (!db.objectStoreNames.contains("pendentes")) {
+      db.createObjectStore("pendentes", { autoIncrement: true });
+    }
   },
 });
 
-// Fetch: GET = cache; POST = salva offline se falhar
+// Intercepta requisições
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
+  // POST: tenta enviar, se falhar salva no IndexedDB para reenviar depois
   if (request.method === "POST") {
     event.respondWith(
       fetch(request.clone()).catch(async () => {
@@ -76,32 +80,31 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // GET: responde do cache ou busca na rede e atualiza cache, se falhar retorna offline.html
   if (request.method === "GET") {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
         return (
           cachedResponse ||
-          fetch(request).then((response) => {
-            if (
-              !response ||
-              response.status !== 200 ||
-              response.type !== "basic"
-            ) {
-              return response;
-            }
+          fetch(request)
+            .then((response) => {
+              if (!response || response.status !== 200 || response.type !== "basic") {
+                return response;
+              }
 
-            return caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, response.clone());
-              return response;
-            });
-          }).catch(() => caches.match("/offline.html"))
+              return caches.open(CACHE_NAME).then((cache) => {
+                cache.put(request, response.clone());
+                return response;
+              });
+            })
+            .catch(() => caches.match("/offline.html"))
         );
       })
     );
   }
 });
 
-// Sincroniza requisições POST pendentes
+// Sincroniza requisições POST pendentes quando voltar a conexão
 self.addEventListener("sync", (event) => {
   if (event.tag === "sync-pendentes") {
     event.waitUntil(syncPendentes());
