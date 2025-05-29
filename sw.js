@@ -13,10 +13,8 @@ const ASSETS_TO_CACHE = [
   "/src/css/app.css",
   "/src/js/app.js",
   "/offline.html",
-  // Removido: "/src/js/idb/index-min.js",
 ];
 
-// ✅ Importa a versão UMD do idb
 try {
   importScripts("https://cdn.jsdelivr.net/npm/idb@8/build/umd.js");
   console.log("Service Worker: idb UMD importado com sucesso.");
@@ -41,7 +39,6 @@ if (self.idb) {
   dbPromise = Promise.reject(new Error("idb não disponível."));
 }
 
-// Instala o Service Worker e faz cache dos arquivos estáticos
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -52,7 +49,6 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Ativa o Service Worker e remove caches antigos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) =>
@@ -69,11 +65,9 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Intercepta fetch (GET e POST)
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Intercepta POST offline
   if (request.method === "POST") {
     event.respondWith(
       fetch(request.clone())
@@ -141,8 +135,6 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-
-  // Intercepta GET
   if (request.method === "GET") {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
@@ -177,7 +169,6 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// Background Sync
 self.addEventListener("sync", (event) => {
   if (event.tag === "sync-pendentes") {
     console.log("Service Worker: Sincronização 'sync-pendentes' iniciada.");
@@ -185,7 +176,6 @@ self.addEventListener("sync", (event) => {
   }
 });
 
-// Função para reenviar POSTs salvos
 async function syncPendentes() {
   if (!self.idb || !dbPromise) {
     console.error("Service Worker: IndexedDB não disponível em sync.");
