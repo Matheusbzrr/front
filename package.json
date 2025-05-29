@@ -1,0 +1,23 @@
+{
+  "name": "front",
+  "version": "1.0.0",
+  "description": "**Lista Ae!** é uma aplicação **Progressive Web App (PWA)** desenvolvida para facilitar a criação e o gerenciamento de listas de compras de forma prática, rápida e acessível em qualquer dispositivo. A interface é moderna, responsiva e intuitiva, permitindo que os usuários adicionem, editem e visualizem itens da lista diretamente do navegador.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Matheusbzrr/front.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Matheusbzrr/front/issues"
+  },
+  "homepage": "https://github.com/Matheusbzrr/front#readme",
+  "dependencies": {
+    "idb": "^8.0.3"
+  }
+}
