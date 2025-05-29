@@ -1,10 +1,17 @@
 {
   "name": "Lista Ae!",
   "short_name": "Lista",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "id": "/?source=pwa",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#012619",
   "theme_color": "#118c5f",
+  "description": "Uma lista de compras",
+  "categories": ["shopping", "productivity", "utilities"],
   "icons": [
     {
       "src": "src/icons/icon-48x48.png",
@@ -42,5 +49,5 @@
       "type": "image/png"
     }
   ],
-  "description": "Uma lista de compras"
+  "prefer_related_applications": false
 }
