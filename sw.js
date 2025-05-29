@@ -13,42 +13,18 @@ const ASSETS_TO_CACHE = [
   "/src/css/app.css",
   "/src/js/app.js",
   "/offline.html",
-  "/src/js/idb/index-min.js", 
+  // Removido: "/src/js/idb/index-min.js",
 ];
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Service Worker: Cacheando arquivos estáticos");
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames
-          .filter((cache) => cache !== CACHE_NAME)
-          .map((cache) => {
-            console.log(`Service Worker: Deletando cache antigo: ${cache}`);
-            return caches.delete(cache);
-          })
-      )
-    )
-  );
-  self.clients.claim();
-});
-
+// ✅ Importa a versão UMD do idb
 try {
-  importScripts("/src/js/idb/index-min.js");
+  importScripts("https://cdn.jsdelivr.net/npm/idb@8/build/umd.js");
+  console.log("Service Worker: idb UMD importado com sucesso.");
 } catch (e) {
-  console.error("Falha ao importar idb:", e);
-  
+  console.error("Service Worker: Falha ao importar idb UMD:", e);
 }
 
+// Inicializa o IndexedDB
 let dbPromise;
 if (self.idb) {
   dbPromise = self.idb.openDB("ListaComprasDB", 1, {
@@ -59,33 +35,63 @@ if (self.idb) {
       }
     },
   });
-  console.log("IndexedDB: Promise para 'ListaComprasDB' configurada.");
+  console.log("IndexedDB: DB 'ListaComprasDB' pronto.");
 } else {
-  console.error("Biblioteca IDB não carregada. Funcionalidade offline de POST pode ser afetada.");
-  dbPromise = Promise.reject(new Error("IDB library not loaded"));
+  console.error("IndexedDB: Biblioteca idb não carregada.");
+  dbPromise = Promise.reject(new Error("idb não disponível."));
 }
 
+// Instala o Service Worker e faz cache dos arquivos estáticos
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log("Service Worker: Cacheando arquivos estáticos.");
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+  self.skipWaiting();
+});
+
+// Ativa o Service Worker e remove caches antigos
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames
+          .filter((cache) => cache !== CACHE_NAME)
+          .map((cache) => {
+            console.log(`Service Worker: Removendo cache antigo: ${cache}`);
+            return caches.delete(cache);
+          })
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+// Intercepta fetch (GET e POST)
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
+  // Intercepta POST offline
   if (request.method === "POST") {
     event.respondWith(
       fetch(request.clone())
-        .then(response => {
-          if (!response.ok) {
-            console.warn(`Service Worker: Resposta de rede para POST ${request.url} não foi OK: ${response.status}`);
-          }
-          return response;
-        })
+        .then((response) => response)
         .catch(async () => {
-          console.log(`Service Worker: Falha na rede para POST ${request.url}. Tentando salvar no IndexedDB.`);
+          console.log(`Service Worker: Salvando POST offline: ${request.url}`);
+
           if (!self.idb || !dbPromise) {
-             console.error("Service Worker: IDB não está disponível para salvar POST offline.");
-             return new Response(
-                JSON.stringify({ sucesso: false, error: "IDB not available", offline: true }),
-                { status: 500, headers: { "Content-Type": "application/json" } }
-              );
+            return new Response(
+              JSON.stringify({
+                sucesso: false,
+                offline: true,
+                error: "IndexedDB não disponível.",
+              }),
+              { status: 500, headers: { "Content-Type": "application/json" } }
+            );
           }
+
           try {
             const db = await dbPromise;
             const clonedRequest = request.clone();
@@ -93,30 +99,41 @@ self.addEventListener("fetch", (event) => {
 
             const requestToStore = {
               url: clonedRequest.url,
-              method: "POST", 
+              method: "POST",
               body,
               headers: [...clonedRequest.headers.entries()],
-              timestamp: Date.now()
+              timestamp: Date.now(),
             };
 
             const key = await db.add("pendentes", requestToStore);
-            console.log(`Service Worker: Requisição POST para ${requestToStore.url} salva no IndexedDB com chave ${key}.`, requestToStore);
+            console.log(
+              `Service Worker: POST salvo no IndexedDB (chave ${key}).`
+            );
 
             if (self.registration.sync) {
               await self.registration.sync.register("sync-pendentes");
-              console.log("Service Worker: Sincronização 'sync-pendentes' registrada.");
-            } else {
-              console.warn("Service Worker: Background Sync não é suportado neste navegador.");
+              console.log("Service Worker: sync-pendentes registrado.");
             }
-          
+
             return new Response(
-              JSON.stringify({ sucesso: false, offline: true, message: "Requisição salva para envio posterior." }),
+              JSON.stringify({
+                sucesso: false,
+                offline: true,
+                message: "Requisição salva para envio posterior.",
+              }),
               { headers: { "Content-Type": "application/json" } }
             );
           } catch (error) {
-            console.error("Service Worker: Erro ao salvar requisição POST no IndexedDB:", error);
+            console.error(
+              "Service Worker: Falha ao salvar POST offline:",
+              error
+            );
             return new Response(
-              JSON.stringify({ sucesso: false, error: "Falha ao salvar requisição offline.", details: error.message }),
+              JSON.stringify({
+                sucesso: false,
+                error: "Erro ao salvar no IndexedDB.",
+                detalhes: error.message,
+              }),
               { status: 500, headers: { "Content-Type": "application/json" } }
             );
           }
@@ -125,32 +142,34 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Intercepta GET
   if (request.method === "GET") {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
         if (cachedResponse) {
-          
           return cachedResponse;
         }
-      
+
         return fetch(request)
           .then((response) => {
-            if (!response || response.status !== 200 || response.type !== "basic") {
-              if (response) {
-                
-              }
+            if (
+              !response ||
+              response.status !== 200 ||
+              response.type !== "basic"
+            ) {
               return response;
             }
 
             const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              
-              cache.put(request, responseToCache);
-            });
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => cache.put(request, responseToCache));
             return response;
           })
           .catch(() => {
-            console.log(`Service Worker: Falha na rede para GET ${request.url}. Servindo offline.html do cache.`);
+            console.log(
+              `Service Worker: GET offline para ${request.url}. Servindo /offline.html`
+            );
             return caches.match("/offline.html");
           });
       })
@@ -158,19 +177,21 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
+// Background Sync
 self.addEventListener("sync", (event) => {
   if (event.tag === "sync-pendentes") {
-    console.log("Service Worker: Evento de sincronização 'sync-pendentes' recebido.");
+    console.log("Service Worker: Sincronização 'sync-pendentes' iniciada.");
     event.waitUntil(syncPendentes());
   }
 });
 
+// Função para reenviar POSTs salvos
 async function syncPendentes() {
   if (!self.idb || !dbPromise) {
-     console.error("Service Worker (syncPendentes): IDB não está disponível.");
-     return;
+    console.error("Service Worker: IndexedDB não disponível em sync.");
+    return;
   }
-  console.log("Service Worker: Iniciando sincronização de requisições POST pendentes.");
+
   const db = await dbPromise;
   const tx = db.transaction("pendentes", "readwrite");
   const store = tx.objectStore("pendentes");
@@ -180,45 +201,49 @@ async function syncPendentes() {
   let failureCount = 0;
 
   while (cursor) {
-    const req = cursor.value; 
-    const reqKey = cursor.key; 
+    const { url, method, headers, body } = cursor.value;
+    const key = cursor.key;
 
-    console.log(`Service Worker: Tentando reenviar requisição pendente (ID: ${reqKey}):`, req.url);
     try {
-      const response = await fetch(req.url, {
-        method: req.method,
-        headers: new Headers(req.headers), 
-        body: JSON.stringify(req.body), 
+      const response = await fetch(url, {
+        method,
+        headers: new Headers(headers),
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
-        console.log(`Service Worker: Requisição (ID: ${reqKey}, URL: ${req.url}) reenviada com sucesso!`);
-        await cursor.delete(); 
+        console.log(`Service Worker: POST reenviado com sucesso (ID ${key})`);
+        await cursor.delete();
         successCount++;
       } else {
-        console.error(`Service Worker: Falha ao reenviar requisição (ID: ${reqKey}, URL: ${req.url}). Status: ${response.status}`);
+        console.error(
+          `Service Worker: Erro ao reenviar POST (ID ${key}) - Status: ${response.status}`
+        );
         if (response.status >= 400 && response.status < 500) {
-          console.log(`Service Worker: Erro do cliente para requisição (ID: ${reqKey}). Removendo da fila.`);
           await cursor.delete();
         }
         failureCount++;
       }
     } catch (error) {
-      console.error(`Service Worker: Erro de rede ao tentar reenviar requisição (ID: ${reqKey}, URL: ${req.url}):`, error);
+      console.error(
+        `Service Worker: Falha de rede ao reenviar POST (ID ${key}):`,
+        error
+      );
       failureCount++;
     }
+
     cursor = await cursor.continue();
   }
 
   await tx.done;
-  console.log(`Service Worker: Sincronização 'pendentes' finalizada. Sucessos: ${successCount}, Falhas (mantidas na fila ou removidas por erro 4xx): ${failureCount}.`);
-  
-  
-  const remainingItems = await db.count('pendentes');
-  if (remainingItems > 0) {
-    console.log(`Service Worker: Ainda existem ${remainingItems} requisições pendentes.`);
-    
+  console.log(
+    `Service Worker: Sync finalizado. Sucesso: ${successCount}, Falha: ${failureCount}`
+  );
+
+  const pendentesRestantes = await db.count("pendentes");
+  if (pendentesRestantes > 0) {
+    console.log(`Ainda há ${pendentesRestantes} requisições pendentes.`);
   } else {
-    console.log("Service Worker: Todas as requisições pendentes foram processadas.");
+    console.log("Todos os POSTs pendentes foram processados.");
   }
 }
